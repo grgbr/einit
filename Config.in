@@ -1,0 +1,75 @@
+config TINIT_ASSERT
+	bool "Assertion"
+	default n
+	help
+	  Build tinit with assertions enabled.
+
+config TINIT_DEBUG
+	bool "Debug build"
+	default n
+	help
+	  Build tinit with debug enabled.
+
+config SYSCONFDIR_ENVVAR
+	string
+	option env="SYSCONFDIR"
+
+config SYSCONFDIR
+	string
+	default SYSCONFDIR_ENVVAR
+
+config RUNSTATEDIR_ENVVAR
+	string
+	option env="RUNSTATEDIR"
+
+config RUNSTATEDIR
+	string
+	default RUNSTATEDIR_ENVVAR
+
+config TINIT_ENVIRON_PATH
+	string "PATH environment variable"
+	default "/sbin:/bin"
+	help
+	  Default environment PATH variable value.
+
+config TINIT_ENVIRON_TERM
+	string "TERM environment variable"
+	default "linux"
+	help
+	  Default environment TERM variable value.
+
+config TINIT_MNTTAB_PATH
+	string "Mount table path"
+	default "/proc/self/mounts"
+	help
+	  Path to file where mounting points table is stored.
+
+config TINIT_FSTYPE_PATH
+	string "Filesystem type table path"
+	default "/proc/filesystems"
+	help
+	  Path to file where filesystem type table is stored.
+
+config TINIT_ROOT_MNT_OPTS
+	string "Root FS mount options"
+	default "mode=0755"
+	help
+	  Extra options given at root filesystem mounting time.
+
+config TINIT_DEV_MNT_OPTS
+	string "Dev FS mount options"
+	default "size=4k,nr_inodes=128,mode=0700"
+	help
+	  Extra options given at dev filesystem mounting time.
+
+config TINIT_RUN_MNT_OPTS
+	string "RUNSTATEDIR FS mount options"
+	default "size=1m,mode=755"
+	help
+	  Extra options given at runstatedir filesystem mounting time.
+
+config TINIT_GID
+	int "Group ID"
+	default 0
+	help
+	  GID allowed to interact with the init process.

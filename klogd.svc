@@ -1,0 +1,4 @@
+name:        klogd
+description: Kernel ring logger
+respawn:     [ /sbin/klogd, -n ]
+
