@@ -7,13 +7,14 @@ solibs              := libtinit.so
 libtinit.so-objs     = lib.o conf.o strarr.o common.o
 libtinit.so-cflags   = $(common-cflags) -DPIC -fpic
 libtinit.so-ldflags  = $(EXTRA_LDFLAGS) -shared -fpic -Wl,-soname,libtinit.so
-libtinit.so-pkgconf  = libutils libconfig libelog
+libtinit.so-pkgconf  = libconfig libelog libutils
 
 bins                := init
 init-objs            = init.o mnt.o notif.o repo.o sigchan.o srv.o svc.o \
                        sys.o target.o log.o
 init-cflags          = $(common-cflags)
-init-ldflags         = $(EXTRA_LDFLAGS) -ltinit -lutils -lelog
+init-ldflags         = $(EXTRA_LDFLAGS) -ltinit
+init-pkgconf        := libelog libutils
 init-path            = $(SBINDIR)/init
 
 bins                += svctl

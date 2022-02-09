@@ -2,6 +2,7 @@
 #include "log.h"
 #include <utils/slist.h>
 #include <utils/path.h>
+#include <utils/pwd.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -282,13 +283,111 @@ mount_pseudo(const char *  dir,
 	return 0;
 }
 
+#define TINIT_MQUEUE_MNTPT "/dev/mqueue"
+#define TINIT_MQUEUE_MODE  UCONCAT(0, CONFIG_TINIT_MQUEUE_MODE)
+
+static int
+mount_mqueue(void)
+{
+	int   err;
+	gid_t gid = 0;
+
+	if (upath_mkdir(TINIT_MQUEUE_MNTPT, S_IRWXU)) {
+		assert(errno != EFAULT);
+		assert(errno != ENAMETOOLONG);
+		assert(errno != EPERM);
+
+		tinit_err("'" TINIT_MQUEUE_MNTPT "': "
+		          "cannot create message queue mount point: %s (%d).",
+		          strerror(errno),
+		          errno);
+
+		return -errno;
+	}
+
+	err = mount_pseudo(TINIT_MQUEUE_MNTPT,
+	                   "mqueue",
+	                   TINIT_PSEUDO_MNT_BASE_FLAGS | MS_NOATIME | MS_NODEV,
+	                   NULL);
+	if (err)
+		return err;
+
+	err = upath_chmod(TINIT_MQUEUE_MNTPT, TINIT_MQUEUE_MODE);
+	if (err) {
+		tinit_warn("cannot set message queue mount point permissions: "
+		           "%s (%d)",
+		           strerror(-err),
+		           -err);
+		return 0;
+	}
+
+	err = upwd_get_gid_byname(CONFIG_TINIT_MQUEUE_GROUP, &gid);
+	if (err) {
+		tinit_warn("invalid '" CONFIG_TINIT_MQUEUE_GROUP "' "
+		           "message queue group: %s (%d).",
+		           strerror(-err),
+		           -err);
+		return 0;
+	}
+
+	err = upath_chown(TINIT_MQUEUE_MNTPT, 0, gid);
+	if (err)
+		tinit_warn("cannot set message queue mount point ownership: "
+		           "%s (%d)",
+		           strerror(-err),
+		           -err);
+
+	return 0;
+}
+
+#define TINIT_DEV_MNTPT "/dev"
+
+static int
+mount_devfs(void)
+{
+	int err;
+
+	err = mount_pseudo(TINIT_DEV_MNTPT,
+	                   "devtmpfs",
+	                   TINIT_PSEUDO_MNT_BASE_FLAGS | MS_NOATIME,
+	                   NULL);
+	if (err)
+		return err;
+
+	/*
+	 * For some reason, additional mount options are only applied at
+	 * remounting time...
+	 * Mode option will be ignored and it is required to perform a chmod(2)
+	 * to modify permissions of mount point directory "/dev".
+	 */
+	err = mnt_remount(TINIT_DEV_MNTPT,
+	                  TINIT_PSEUDO_MNT_BASE_FLAGS | MS_NOATIME,
+	                  CONFIG_TINIT_DEV_MNT_OPTS);
+	if (err)
+		tinit_warn("cannot set device filesystem mount options: "
+		           "%s (%d).",
+		          strerror(-err),
+		          -err);
+
+	/* Setup sane secure defaults for devices below. */
+	err = upath_chmod(TINIT_DEV_MNTPT "/kmsg", S_IRUSR | S_IWUSR);
+	err = upath_chmod(TINIT_DEV_MNTPT "/ptmx", S_IRUSR | S_IWUSR);
+	err = upath_chmod(TINIT_DEV_MNTPT "/random", S_IRUSR | S_IWUSR);
+	err = upath_chmod(TINIT_DEV_MNTPT "/urandom", S_IRUSR | S_IWUSR |
+	                                              S_IRGRP |
+	                                              S_IROTH);
+
+	return 0;
+}
+
 static int
 remount_root(void)
 {
 	int err;
 
 	err = mnt_remount("/",
-	                  MS_RDONLY | MS_NODIRATIME | MS_NOATIME | MS_NODEV,
+	                  MS_RDONLY | MS_NODIRATIME | MS_NOATIME |
+	                  MS_NOSUID | MS_NODEV,
 	                  CONFIG_TINIT_ROOT_MNT_OPTS);
 	if (err) {
 		tinit_err("cannot remount root filesystem: %s (%d).",
@@ -308,7 +407,7 @@ mnt_mount_all(void)
 	err = mount_pseudo("/proc",
 	                   "proc",
 	                   TINIT_PSEUDO_MNT_BASE_FLAGS | MS_NOATIME | MS_NODEV,
-	                   NULL);
+	                   CONFIG_TINIT_PROC_MNT_OPTS);
 	if (err)
 		return err;
 
@@ -319,10 +418,11 @@ mnt_mount_all(void)
 	if (err)
 		return err;
 
-	err = mount_pseudo("/dev",
-	                   "devtmpfs",
-	                   TINIT_PSEUDO_MNT_BASE_FLAGS | MS_NOATIME,
-	                   CONFIG_TINIT_DEV_MNT_OPTS);
+	err = mount_devfs();
+	if (err)
+		return err;
+
+	err = mount_mqueue();
 	if (err)
 		return err;
 

@@ -56,20 +56,40 @@ config TINIT_ROOT_MNT_OPTS
 	help
 	  Extra options given at root filesystem mounting time.
 
+config TINIT_PROC_MNT_OPTS
+	string "Proc FS mount options"
+	default "hidepid=invisible"
+	help
+	  Extra options given at proc filesystem mounting time.
+
 config TINIT_DEV_MNT_OPTS
 	string "Dev FS mount options"
-	default "size=4k,nr_inodes=128,mode=0700"
+	default "size=512k,nr_inodes=128"
 	help
-	  Extra options given at dev filesystem mounting time.
+	  Extra options given at dev filesystem remounting time.
 
 config TINIT_RUN_MNT_OPTS
 	string "RUNSTATEDIR FS mount options"
-	default "size=1m,mode=755"
+	default "size=1m,nr_inodes=256,mode=0755"
 	help
 	  Extra options given at runstatedir filesystem mounting time.
+
+config TINIT_MQUEUE_GROUP
+	string "Message queue FS group"
+	default "mqueue"
+	help
+	  Group name of message queue filesystem mount point.
+
+config TINIT_MQUEUE_MODE
+	int "Message queue FS permissions"
+	default 1770
+	help
+	  Permissions assigned to message queue filesystem mount point.
 
 config TINIT_GID
 	int "Group ID"
 	default 0
 	help
 	  GID allowed to interact with the init process.
+
+# ex: filetype=kconfig

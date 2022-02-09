@@ -117,7 +117,7 @@ tinit_create_mqueue(const struct elog_mqueue_conf * conf)
 	};
 	struct elog *  log;
 
-	err = upwd_get_gid(CONFIG_TINIT_MQLOG_GROUP, &gid);
+	err = upwd_get_gid_byname(CONFIG_TINIT_MQLOG_GROUP, &gid);
 	if (err) {
 		tinit_warn("invalid logger message queue group name '%s': "
 		           "%s (%d).",
