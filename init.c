@@ -100,7 +100,7 @@ tinit_parse_cmdln(int argc, char * const argv[])
 {
 	int a;
 
-	for (a = 0; a < argc; a++)
+	for (a = 1; a < argc; a++)
 		tinit_parse_arg(argv[a]);
 }
 
