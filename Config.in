@@ -52,7 +52,7 @@ config TINIT_FSTYPE_PATH
 
 config TINIT_ROOT_MNT_OPTS
 	string "Root FS mount options"
-	default "mode=0755"
+	default ""
 	help
 	  Extra options given at root filesystem mounting time.
 
