@@ -135,7 +135,7 @@ tinit_target_walk_folder(const struct tinit_target_folder * folder)
 
 			tinit_err("%.*s: cannot load target service entry: "
 			          "%s (%d).",
-			          folder->dlen,
+			          (int)folder->dlen,
 			          folder->dpath,
 			          strerror(ret),
 			          ret);
@@ -151,7 +151,7 @@ tinit_target_walk_folder(const struct tinit_target_folder * folder)
 		if (!base) {
 			tinit_warn("%.*s/%s: invalid target service link: "
 			           "%s (%d).",
-			           folder->dlen,
+			           (int)folder->dlen,
 			           folder->dpath,
 			           ent->d_name,
 			           strerror(errno),
@@ -164,7 +164,7 @@ tinit_target_walk_folder(const struct tinit_target_folder * folder)
 			return svc;
 
 		tinit_warn("%.*s/%s: target service not found.",
-		           folder->dlen,
+		           (int)folder->dlen,
 		           folder->dpath,
 		           ent->d_name);
 	}

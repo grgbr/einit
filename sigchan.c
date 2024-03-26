@@ -186,8 +186,8 @@ tinit_sigchan_handle_sigchld(const struct tinit_repo * repo)
 
 static int
 tinit_sigchan_dispatch_started(struct upoll_worker * worker,
-                               uint32_t              state,
-                               const struct upoll *  poller)
+                               uint32_t              state __unused,
+                               const struct upoll *  poller __unused)
 {
 	assert(worker);
 	assert(state);
@@ -279,7 +279,7 @@ tinit_sigchan_start(struct tinit_sigchan *        chan,
 
 static int
 tinit_sigchan_dispatch_stopping(struct upoll_worker * worker,
-                                uint32_t              state,
+                                uint32_t              state __unused,
                                 const struct upoll *  poller)
 {
 	assert(worker);
