@@ -36,8 +36,8 @@ includedir=$${prefix}/include
 
 Name: libtinit
 Description: Tinit service library
-Version: %%PKG_VERSION%%
-Requires:
+Version: $(VERSION)
+Requires: libconfig libelog libutils libstroll
 Cflags: -I$${includedir}
 Libs: -L$${libdir} -ltinit
 endef
