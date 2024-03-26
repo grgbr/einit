@@ -1,4 +1,5 @@
 #include "conf.h"
+#include <stroll/cdefs.h>
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
@@ -1023,12 +1024,12 @@ conf_load_root(struct conf_svc * conf)
 		assert(name);
 		assert(name[0]);
 
-		for (l = 0; l < array_nr(conf_loaders); l++) {
+		for (l = 0; l < stroll_array_nr(conf_loaders); l++) {
 			if (!strcmp(name, conf_loaders[l].name))
 				break;
 		}
 
-		if (l == array_nr(conf_loaders)) {
+		if (l == stroll_array_nr(conf_loaders)) {
 			conf_log_warn(set, "skipping unknown setting");
 			continue;
 		}

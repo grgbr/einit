@@ -2,6 +2,7 @@
 #include "svc.h"
 #include "repo.h"
 #include "log.h"
+#include <stroll/cdefs.h>
 #include <utils/signal.h>
 #include <sys/types.h>
 #include <sys/wait.h>
@@ -205,7 +206,7 @@ tinit_sigchan_dispatch_started(struct upoll_worker * worker,
 	unsigned int            cnt;
 	unsigned int            i;
 
-	ret = usig_read_fd(chan->fd, infos, array_nr(infos));
+	ret = usig_read_fd(chan->fd, infos, stroll_array_nr(infos));
 	assert(ret);
 	if (ret < 0)
 		return (ret == -EAGAIN) ? 0 : ret;
@@ -299,7 +300,7 @@ tinit_sigchan_dispatch_stopping(struct upoll_worker * worker,
 
 	assert(chan->cnt);
 
-	ret = usig_read_fd(chan->fd, infos, array_nr(infos));
+	ret = usig_read_fd(chan->fd, infos, stroll_array_nr(infos));
 	assert(ret);
 	if (ret < 0)
 		return (ret == -EAGAIN) ? 0 : ret;

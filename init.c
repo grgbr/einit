@@ -5,6 +5,7 @@
 #include "sigchan.h"
 #include "srv.h"
 #include "proto.h"
+#include <stroll/cdefs.h>
 #include <utils/path.h>
 #include <utils/signal.h>
 #include <utils/string.h>
@@ -80,7 +81,7 @@ tinit_parse_arg(char * arg)
 		goto warn;
 
 	val++;
-	for (p = 0; p < array_nr(tinit_cmdln_parsers); p++) {
+	for (p = 0; p < stroll_array_nr(tinit_cmdln_parsers); p++) {
 		const struct tinit_cmdln_parser * parser;
 
 		parser = &tinit_cmdln_parsers[p];
