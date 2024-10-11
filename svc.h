@@ -24,19 +24,19 @@ typedef void (svc_handle_notif_fn)(struct svc *       svc,
                                    const struct svc * src);
 
 struct svc {
-	struct dlist_node       repo;
-	svc_handle_evts_fn *    handle_evts;
-	pid_t                   child;
-	enum tinit_svc_state    state;
-	svc_handle_notif_fn *   handle_notif;
-	struct utimer           timer;
-	unsigned int            start_cmd;
-	struct dlist_node       starton_obsrv;
-	struct notif_poll *     starton_notif;
-	int                     stop_cmd;
-	struct dlist_node       stopon_obsrv;
-	struct notif_poll *     stopon_notif;
-	const struct conf_svc * conf;
+	struct stroll_dlist_node repo;
+	svc_handle_evts_fn *     handle_evts;
+	pid_t                    child;
+	enum tinit_svc_state     state;
+	svc_handle_notif_fn *    handle_notif;
+	struct utimer            timer;
+	unsigned int             start_cmd;
+	struct stroll_dlist_node starton_obsrv;
+	struct notif_poll *      starton_notif;
+	int                      stop_cmd;
+	struct stroll_dlist_node stopon_obsrv;
+	struct notif_poll *      stopon_notif;
+	const struct conf_svc *  conf;
 };
 
 extern bool

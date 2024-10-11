@@ -749,10 +749,10 @@ svc_register_stopon_obsrv(struct svc * svc, struct svc * obsrv)
 }
 
 static int
-svc_init_notif_obsrv(struct svc *          svc,
-                     struct notif_poll **  notif,
-                     struct dlist_node *   obsrv,
-                     const struct strarr * conf)
+svc_init_notif_obsrv(struct svc *               svc,
+                     struct notif_poll **       notif,
+                     struct stroll_dlist_node * obsrv,
+                     const struct strarr *      conf)
 {
 	if (conf) {
 		struct notif_poll * poll;
@@ -766,7 +766,7 @@ svc_init_notif_obsrv(struct svc *          svc,
 	else
 		*notif = NULL;
 
-	dlist_init(obsrv);
+	stroll_dlist_init(obsrv);
 
 	return 0;
 }
@@ -835,13 +835,14 @@ svc_create(const struct conf_svc * conf)
 }
 
 static void
-svc_unregister_notif_obsrv(struct dlist_node * obsrv, struct notif_poll * notif)
+svc_unregister_notif_obsrv(struct stroll_dlist_node * obsrv,
+                           struct notif_poll *        notif)
 {
 	/* Unregister all state changes observers. */
-	while (!dlist_empty(obsrv)) {
+	while (!stroll_dlist_empty(obsrv)) {
 		struct notif * notif;
 
-		notif = notif_from_dlist(dlist_next(obsrv));
+		notif = notif_from_dlist(stroll_dlist_next(obsrv));
 		assert(notif);
 
 		notif_unregister_sink(notif);

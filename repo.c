@@ -19,7 +19,7 @@
 	          _err)
 
 struct tinit_repo tinit_repo_inst = {
-	.list = DLIST_INIT(tinit_repo_inst.list)
+	.list = STROLL_DLIST_INIT(tinit_repo_inst.list)
 };
 
 struct svc *
@@ -216,7 +216,7 @@ tinit_repo_load_svc(struct tinit_repo *   repo,
 	}
 
 	/* Register main service repository. */
-	dlist_append(&repo->list, &svc->repo);
+	stroll_dlist_append(&repo->list, &svc->repo);
 
 	return 0;
 }
@@ -292,12 +292,14 @@ tinit_repo_clear(struct tinit_repo * repo)
 {
 	assert(repo);
 
-	while (!dlist_empty(&repo->list)) {
+	while (!stroll_dlist_empty(&repo->list)) {
 		struct svc * svc;
 
-		svc = dlist_entry(dlist_next(&repo->list), struct svc, repo);
+		svc = stroll_dlist_entry(stroll_dlist_next(&repo->list),
+		                         struct svc,
+		                         repo);
 		assert(svc);
-		dlist_remove(&svc->repo);
+		stroll_dlist_remove(&svc->repo);
 
 		svc_destroy(svc);
 	}

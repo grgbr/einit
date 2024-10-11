@@ -1,24 +1,25 @@
 #ifndef _TINIT_NOTIF_H
 #define _TINIT_NOTIF_H
 
-#include <utils/dlist.h>
+#include "common.h"
+#include <stroll/dlist.h>
 #include <assert.h>
 
 struct svc;
 
 struct notif {
-	struct dlist_node node;
-	struct svc *      src;
-	struct svc *      sink;
+	struct stroll_dlist_node node;
+	struct svc *             src;
+	struct svc *             sink;
 };
 
 #define notif_foreach(_list, _notif) \
-	dlist_foreach_entry(_list, _notif, node)
+	stroll_dlist_foreach_entry(_list, _notif, node)
 
 static inline struct notif * 
-notif_from_dlist(struct dlist_node * node)
+notif_from_dlist(struct stroll_dlist_node * node)
 {
-	return dlist_entry(node, struct notif, node);
+	return stroll_dlist_entry(node, struct notif, node);
 }
 
 static inline struct svc *
@@ -73,9 +74,9 @@ notif_get_poll_cnt(const struct notif_poll * poll)
 }
 
 extern void
-notif_register_poll_sink(struct notif_poll *          poll,
-                         struct dlist_node * sinks,
-                         struct svc *                 src);
+notif_register_poll_sink(struct notif_poll *        poll,
+                         struct stroll_dlist_node * sinks,
+                         struct svc *               src);
 
 extern void
 notif_unregister_poll_sinks(struct notif_poll * poll);

@@ -2,29 +2,29 @@
 #define _TINIT_REPO_H
 
 #include "common.h"
-#include <utils/dlist.h>
+#include <stroll/dlist.h>
 
 struct svc;
 
 struct tinit_repo {
-	struct dlist_node list;
+	struct stroll_dlist_node list;
 };
 
 #define tinit_repo_foreach(_repo, _svc) \
-	dlist_foreach_entry(&(_repo)->list, _svc, repo)
+	stroll_dlist_foreach_entry(&(_repo)->list, _svc, repo)
 
 extern struct svc *
 tinit_repo_search_byname(
 	const struct tinit_repo * repo,
-	const char                         name[TINIT_SVC_NAME_MAX]);
+	const char                name[TINIT_SVC_NAME_MAX]);
 
 extern struct svc *
 tinit_repo_search_bypath(const struct tinit_repo * repo,
-                         const char                         path[NAME_MAX]);
+                         const char                path[NAME_MAX]);
 
 extern struct svc *
 tinit_repo_search_bypid(const struct tinit_repo * repo,
-                        pid_t                              pid);
+                        pid_t                     pid);
 
 extern int
 tinit_repo_load(struct tinit_repo * repo);

@@ -2,9 +2,9 @@
 #include <stdlib.h>
 
 static void
-notif_register_sink(struct notif *               notif,
-                    struct dlist_node * sinks,
-                    struct svc *                 src)
+notif_register_sink(struct notif *             notif,
+                    struct stroll_dlist_node * sinks,
+                    struct svc *               src)
 {
 	assert(notif);
 	assert(!notif->src);
@@ -14,7 +14,7 @@ notif_register_sink(struct notif *               notif,
 
 	notif->src = src;
 
-	dlist_nqueue_back(sinks, &notif->node);
+	stroll_dlist_nqueue_back(sinks, &notif->node);
 }
 
 void
@@ -24,17 +24,17 @@ notif_unregister_sink(struct notif * notif)
 	assert(notif->sink);
 
 	if (notif->src) {
-		assert(!dlist_empty(&notif->node));
+		assert(!stroll_dlist_empty(&notif->node));
 
-		dlist_remove(&notif->node);
+		stroll_dlist_remove(&notif->node);
 		notif->src = NULL;
 	}
 }
 
 void
-notif_register_poll_sink(struct notif_poll *          poll,
-                         struct dlist_node * sinks,
-                         struct svc *                 src)
+notif_register_poll_sink(struct notif_poll *        poll,
+                         struct stroll_dlist_node * sinks,
+                         struct svc *               src)
 {
 	assert(poll);
 	assert(poll->nr);
