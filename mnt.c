@@ -1,6 +1,6 @@
 #include "mnt.h"
 #include "log.h"
-#include <utils/slist.h>
+#include <stroll/slist.h>
 #include <utils/path.h>
 #include <utils/pwd.h>
 #include <stdlib.h>
@@ -12,8 +12,8 @@
 #include <sys/mount.h>
 
 struct mnt_table {
-	struct slist points;
-	struct slist types;
+	struct stroll_slist points;
+	struct stroll_slist types;
 };
 
 /******************************************************************************
@@ -77,10 +77,10 @@ mnt_remount(const char * dir, unsigned long flags, const char * opts)
 #define FSTYPE_MAX (256U)
 
 struct mnt_fstype {
-	struct slist_node node;
-	bool              skip;
-	char              name[FSTYPE_MAX];
-	int               mask;
+	struct stroll_slist_node node;
+	bool                     skip;
+	char                     name[FSTYPE_MAX];
+	int                      mask;
 };
 
 static struct mnt_fstype *
@@ -147,12 +147,13 @@ mnt_release_fstypes(struct mnt_table * table)
 {
 	assert(table);
 
-	while (!slist_empty(&table->types)) {
+	while (!stroll_slist_empty(&table->types)) {
 		struct mnt_fstype * type;
 
-		type = slist_entry(slist_dqueue(&table->types),
-		                   struct mnt_fstype,
-		                   node);
+		type = stroll_slist_entry(
+			stroll_slist_dqueue_front(&table->types),
+			struct mnt_fstype,
+			node);
 		mnt_destroy_fstype(type);
 	}
 }
@@ -177,7 +178,7 @@ mnt_load_fstypes(struct mnt_table * table)
 		goto close;
 	}
 
-	slist_init(&table->types);
+	stroll_slist_init(&table->types);
 
 	while (!feof(file)) {
 		ssize_t             len;
@@ -226,7 +227,7 @@ mnt_load_fstypes(struct mnt_table * table)
 			continue;
 		}
 
-		slist_nqueue(&table->types, &type->node);
+		stroll_slist_nqueue_back(&table->types, &type->node);
 	}
 
 	ret = 0;
@@ -247,7 +248,7 @@ mnt_find_fstype(struct mnt_table * table, const char * fstype)
 {
 	struct mnt_fstype * type;
 
-	slist_foreach_entry(&table->types, type, node)
+	stroll_slist_foreach_entry(&table->types, type, node)
 		if (!strncmp(type->name, fstype, sizeof(type->name)))
 			return type;
 
@@ -459,10 +460,10 @@ mnt_mount_all(void)
  ******************************************************************************/
 
 struct mnt_point {
-	struct slist_node node;
-	char              fsname[PATH_MAX];
-	char              dir[PATH_MAX];
-	char              type[FSTYPE_MAX];
+	struct stroll_slist_node node;
+	char                     fsname[PATH_MAX];
+	char                     dir[PATH_MAX];
+	char                     type[FSTYPE_MAX];
 };
 
 static int
@@ -536,12 +537,13 @@ mnt_release_points(struct mnt_table * table)
 {
 	assert(table);
 
-	while (!slist_empty(&table->points)) {
+	while (!stroll_slist_empty(&table->points)) {
 		struct mnt_point * pt;
 
-		pt = slist_entry(slist_dqueue(&table->points),
-		                 struct mnt_point,
-		                 node);
+		pt = stroll_slist_entry(
+			stroll_slist_dqueue_front(&table->points),
+			struct mnt_point,
+			node);
 		mnt_destroy_point(pt);
 	}
 }
@@ -560,7 +562,7 @@ mnt_load_points(struct mnt_table * table)
 		return -errno;
 	}
 
-	slist_init(&table->points);
+	stroll_slist_init(&table->points);
 
 	while (true) {
 		struct mntent    * ent;
@@ -594,9 +596,7 @@ mnt_load_points(struct mnt_table * table)
 			continue;
 		}
 
-		slist_append(&table->points,
-		             slist_head(&table->points),
-		             &pt->node);
+		stroll_slist_nqueue_front(&table->points, &pt->node);
 	}
 
 	ret = 0;
@@ -647,7 +647,7 @@ mnt_umount_all(int flags)
 	if (mnt_open_table(&tab))
 	    goto err;
 
-	slist_foreach_entry(&tab.points, pt, node) {
+	stroll_slist_foreach_entry(&tab.points, pt, node) {
 		const struct mnt_fstype * type;
 
 		if (!strcmp(pt->dir, "/"))
