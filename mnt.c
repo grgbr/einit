@@ -285,7 +285,7 @@ mount_pseudo(const char *  dir,
 }
 
 #define TINIT_MQUEUE_MNTPT "/dev/mqueue"
-#define TINIT_MQUEUE_MODE  UCONCAT(0, CONFIG_TINIT_MQUEUE_MODE)
+#define TINIT_MQUEUE_MODE  STROLL_CONCAT(0, CONFIG_TINIT_MQUEUE_MODE)
 
 static int
 mount_mqueue(void)

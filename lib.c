@@ -149,7 +149,7 @@ tinit_parse_status_data(struct tinit_status_data * status, const char * end)
 	assert(end);
 
 	if (&status->conf_path[0] < end) {
-		size_t max = umin(end - &status->conf_path[0], NAME_MAX);
+		size_t max = stroll_min(end - &status->conf_path[0], NAME_MAX);
 		size_t len;
 
 		len = strnlen(&status->conf_path[0], max);
@@ -201,7 +201,8 @@ tinit_step_status(struct tinit_status_iter * iter)
 
 	nxt = (struct tinit_status_data *)
 	      ((char *)curr +
-	       uround_upper(sizeof(*curr) + iter->len + 1, sizeof(*curr)));
+	       stroll_round_upper(sizeof(*curr) + iter->len + 1,
+	                          sizeof(*curr)));
 
 	len = tinit_parse_status_data(nxt, iter->end);
 	if (len < 0)

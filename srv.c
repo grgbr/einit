@@ -97,7 +97,7 @@ tinit_srv_append_status_reply(struct unsk_dgram_buff * buff,
 	assert(buff->unsk.bytes >= sizeof(*msg));
 	assert(buff->unsk.bytes <= TINIT_MSG_SIZE_MAX);
 
-	sz = uround_upper(buff->unsk.bytes, sizeof(*data));
+	sz = stroll_round_upper(buff->unsk.bytes, sizeof(*data));
 	data = (struct tinit_status_data *)&buff->data[sz];
 	sz += sizeof(*data) + len + 1;
 	if (sz > TINIT_MSG_SIZE_MAX) {
