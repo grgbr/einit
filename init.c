@@ -259,7 +259,29 @@ tinit_poll(struct upoll * poller)
 
 	do {
 #warning TODO: ensure EPOLLWAKEUP does not need to be handled, see epoll(7)
-		ret = upoll_process_with_timers(poller);
+		int tmout;
+
+		tmout = etux_timer_issue_msec();
+
+		ret = upoll_wait(poller, tmout);
+		if (ret == -ETIME) {
+			/* Expire timers. */
+			etux_timer_run();
+			continue;
+		}
+
+		if (!tmout)
+			/* Expire timers. */
+			etux_timer_run();
+
+		if (ret < 0) {
+			/* Ignore signals interrupts (i.e. ptrace(2) related) */
+			assert(ret == -EINTR);
+			continue;
+		}
+
+		assert(ret > 0);
+		ret = upoll_dispatch(poller, (unsigned int)ret);
 	} while (ret != -ESHUTDOWN);
 }
 

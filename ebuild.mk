@@ -15,7 +15,7 @@ init-objs            = init.o mnt.o notif.o repo.o sigchan.o srv.o svc.o \
                        sys.o target.o log.o
 init-cflags          = $(common-cflags)
 init-ldflags         = $(EXTRA_LDFLAGS) -ltinit
-init-pkgconf        := libelog libutils libstroll
+init-pkgconf        := libelog libetux_timer_list libstroll
 init-path            = $(SBINDIR)/init
 
 bins                += svctl

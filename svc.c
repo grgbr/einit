@@ -224,7 +224,7 @@ svc_spawn(struct svc * svc, const char * const * args, unsigned int tmout)
 		            args[0],
 		            pid);
 
-		utimer_arm_sec(&svc->timer, tmout);
+		etux_timer_arm_sec(&svc->timer, tmout);
 
 		return pid;
 	}
@@ -315,7 +315,7 @@ svc_may_start(const struct svc * svc)
 }
 
 static void
-svc_expire_on(struct utimer * timer)
+svc_expire_on(struct etux_timer * timer)
 {
 	struct svc * svc = containerof(timer, struct svc, timer);
 
@@ -342,7 +342,7 @@ svc_start(struct svc * svc)
 	svc->handle_evts = svc_handle_on_evts;
 	svc->handle_notif = svc_handle_on_notif;
 	svc->state = TINIT_SVC_STARTING_STAT;
-	utimer_setup(&svc->timer, svc_expire_on);
+	etux_timer_setup(&svc->timer, svc_expire_on);
 	svc->start_cmd = 0;
 
 	if (svc_may_start(svc))
@@ -498,7 +498,7 @@ svc_kill(const struct svc *svc, int signo)
 }
 
 static void
-svc_expire_off(struct utimer * timer)
+svc_expire_off(struct etux_timer * timer)
 {
 	struct svc * svc = containerof(timer, struct svc, timer);
 
@@ -526,7 +526,7 @@ svc_stop(struct svc * svc)
 	svc->handle_evts = svc_handle_off_evts;
 	svc->handle_notif = svc_handle_off_notif;
 	svc->state = TINIT_SVC_STOPPING_STAT;
-	utimer_setup(&svc->timer, svc_expire_off);
+	etux_timer_setup(&svc->timer, svc_expire_off);
 	svc->stop_cmd = -1;
 
 	if (!svc_may_stop(svc))
@@ -534,7 +534,7 @@ svc_stop(struct svc * svc)
 
 	/* Kill current service daemon / process if any. */
 	if (!svc_kill(svc, conf_get_stop_sig(svc->conf))) {
-		utimer_arm_sec(&svc->timer, 5U);
+		etux_timer_arm_sec(&svc->timer, 5U);
 		return;
 	}
 
@@ -573,7 +573,7 @@ svc_handle_on_evts(struct svc * svc, enum svc_evt evt, int status)
 				break;
 			}
 
-			if (!utimer_is_armed(&svc->timer)) {
+			if (!etux_timer_is_armed(&svc->timer)) {
 				svc_respawn(svc);
 				break;
 			}
@@ -596,7 +596,7 @@ svc_handle_on_evts(struct svc * svc, enum svc_evt evt, int status)
 			break;
 
 		case SVC_EXIT_EVT:
-			if (!utimer_is_armed(&svc->timer)) {
+			if (!etux_timer_is_armed(&svc->timer)) {
 				svc->state = TINIT_SVC_STARTING_STAT;
 				svc_respawn(svc);
 				break;
@@ -804,7 +804,7 @@ svc_init(struct svc * svc, const struct conf_svc * conf)
 	svc->handle_notif = svc_handle_off_notif;
 	svc->child = -1;
 	svc->state = TINIT_SVC_STOPPED_STAT;
-	utimer_init(&svc->timer);
+	etux_timer_init(&svc->timer, NULL);
 	svc->conf = conf;
 
 	return 0;

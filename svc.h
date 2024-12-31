@@ -29,7 +29,7 @@ struct svc {
 	pid_t                    child;
 	enum tinit_svc_state     state;
 	svc_handle_notif_fn *    handle_notif;
-	struct utimer            timer;
+	struct etux_timer        timer;
 	unsigned int             start_cmd;
 	struct stroll_dlist_node starton_obsrv;
 	struct notif_poll *      starton_notif;
