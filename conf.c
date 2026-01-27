@@ -566,6 +566,24 @@ conf_load_stdout(struct conf_svc *        conf,
 	return 0;
 }
 
+static int
+conf_load_stderr(struct conf_svc *        conf,
+                 const config_setting_t * setting)
+{
+	const char * path;
+	ssize_t      len;
+
+	len = conf_load_stdio(setting, &path);
+	if (len < 0)
+		return len;
+
+	conf->stderr = strrep(path, len);
+	if (!conf->stderr)
+		return -errno;
+
+	return 0;
+}
+
 /*
  * Check environment variable name validity:
  * - empty name rejected,
@@ -907,6 +925,7 @@ static const struct conf_loader conf_loaders[] = {
 	{ .name = "description", .load = conf_load_desc },
 	{ .name = "stdin",       .load = conf_load_stdin },
 	{ .name = "stdout",      .load = conf_load_stdout },
+	{ .name = "stderr",      .load = conf_load_stderr },
 	{ .name = "environ",     .load = conf_load_env },
 	{ .name = "starton",     .load = conf_load_starton },
 	{ .name = "start",       .load = conf_load_start },
@@ -1164,6 +1183,9 @@ conf_print(const struct conf_svc * conf)
 
 	if (conf->stdout)
 		fprintf(stderr, SVC_PRINT_FORMAT "\n", "STDOUT:", conf->stdout);
+
+	if (conf->stderr)
+		fprintf(stderr, SVC_PRINT_FORMAT "\n", "STDERR:", conf->stderr);
 
 	conf_print_strarr("Environment:", ", ", conf->env);
 
