@@ -45,6 +45,7 @@ conf_seq_get_args(const struct conf_seq * seq, unsigned int cmd)
 struct conf_svc {
 	const char *          stdin;
 	const char *          stdout;
+	const char *          stderr;
 	const struct strarr * env;
 	struct conf_seq       start;
 	const struct strarr * daemon;
