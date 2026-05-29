@@ -293,6 +293,7 @@ mount_mqueue(void)
 	int   err;
 	gid_t gid = 0;
 
+#ifndef CONFIG_TINIT_DEV_NONE
 	if (upath_mkdir(TINIT_MQUEUE_MNTPT, S_IRWXU)) {
 		assert(errno != EFAULT);
 		assert(errno != ENAMETOOLONG);
@@ -305,7 +306,7 @@ mount_mqueue(void)
 
 		return -errno;
 	}
-
+#endif
 	err = mount_pseudo(TINIT_MQUEUE_MNTPT,
 	                   "mqueue",
 	                   TINIT_PSEUDO_MNT_BASE_FLAGS | MS_NOATIME | MS_NODEV,
@@ -343,6 +344,7 @@ mount_mqueue(void)
 
 #define TINIT_DEV_MNTPT "/dev"
 
+#ifdef CONFIG_TINIT_DEV_DEVTMPFS
 static int
 mount_devfs(void)
 {
@@ -380,6 +382,42 @@ mount_devfs(void)
 
 	return 0;
 }
+#elif defined CONFIG_TINIT_DEV_TMPFS
+static int
+mount_devfs(void)
+{
+	int err;
+
+	err = mount_pseudo(TINIT_DEV_MNTPT,
+	                   "tmpfs",
+	                   TINIT_PSEUDO_MNT_BASE_FLAGS | MS_RELATIME,
+	                   CONFIG_TINIT_DEV_MNT_OPTS);
+	if (err)
+		return err;
+
+	err = upath_mknod(TINIT_DEV_MNTPT "/console", S_IFCHR | S_IRUSR | S_IWUSR, makedev(5, 1));
+	err = upath_mknod(TINIT_DEV_MNTPT "/zero",    S_IFCHR | S_IRUSR | S_IWUSR, makedev(1, 5));
+	err = upath_mknod(TINIT_DEV_MNTPT "/random",  S_IFCHR | S_IRUSR | S_IWUSR, makedev(1, 8));
+	err = upath_mknod(TINIT_DEV_MNTPT "/urandom", S_IFCHR | S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH, makedev(1, 9));
+	err = upath_mknod(TINIT_DEV_MNTPT "/null",    S_IFCHR, makedev(1, 3));
+	err = upath_chmod(TINIT_DEV_MNTPT "/null", S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
+	return 0;
+}
+#else
+static inline int
+mount_devfs(void)
+{
+	return 0;
+}
+#endif
+
+#ifndef CONFIG_TINIT_DEV_NONE
+#define CONFIG_TINIT_ROOT_MNT_FLAGS \
+	(MS_RDONLY|MS_NODIRATIME | MS_NOATIME | MS_NOSUID | MS_NODEV)
+#else
+#define CONFIG_TINIT_ROOT_MNT_FLAGS \
+	(MS_RDONLY|MS_NODIRATIME | MS_NOATIME | MS_NOSUID)
+#endif
 
 static int
 remount_root(void)
@@ -387,8 +425,7 @@ remount_root(void)
 	int err;
 
 	err = mnt_remount("/",
-	                  MS_RDONLY | MS_NODIRATIME | MS_NOATIME |
-	                  MS_NOSUID | MS_NODEV,
+	                  CONFIG_TINIT_ROOT_MNT_FLAGS,
 	                  CONFIG_TINIT_ROOT_MNT_OPTS);
 	if (err) {
 		tinit_err("cannot remount root filesystem: %s (%d).",

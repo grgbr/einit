@@ -92,4 +92,15 @@ config TINIT_GID
 	help
 	  GID allowed to interact with the init process.
 
+choice
+	prompt "/dev mount type"
+	default TINIT_DEV_NONE
+	config TINIT_DEV_DEVTMPFS
+		bool "Mount devtmpfs to /dev"
+	config TINIT_DEV_TMPFS
+		bool "Mount tmpfs to /dev"
+	config TINIT_DEV_NONE
+		bool "Do not mount /dev"
+endchoice
+
 # ex: filetype=kconfig
