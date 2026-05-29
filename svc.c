@@ -106,7 +106,7 @@ svc_reopen_stdin(const char * path)
 }
 
 static int
-svc_reopen_stdout(const char * path)
+svc_reopen_stdio(const char * path, int fd)
 {
 	assert(path);
 	assert(path[0]);
@@ -114,11 +114,11 @@ svc_reopen_stdout(const char * path)
 
 	int ret;
 
-	close(STDOUT_FILENO);
+	close(fd);
 
 	ret = sys_open_stdio(path,
 	                     O_WRONLY | O_APPEND | O_NOATIME | O_NOFOLLOW);
-	if (ret != STDOUT_FILENO)
+	if (ret != fd)
 		return (ret < 0) ? ret : -EBADF;
 
 	return 0;
@@ -149,12 +149,12 @@ svc_exec(const struct svc * svc, const char * const * args)
 			goto exit;
 
 	if (conf->stdout) {
-		if (svc_reopen_stdout(conf->stdout))
+		if (svc_reopen_stdio(conf->stdout, STDOUT_FILENO))
 			goto exit;
+	}
 
-		/* Duplicate stderr onto stdout. */
-		ret = sys_dup2(STDOUT_FILENO, STDERR_FILENO);
-		if (ret < 0)
+	if (conf->stderr) {
+		if (svc_reopen_stdio(conf->stderr, STDERR_FILENO))
 			goto exit;
 	}
 
