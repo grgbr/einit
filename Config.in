@@ -86,6 +86,12 @@ config TINIT_MQUEUE_MODE
 	help
 	  Permissions assigned to message queue filesystem mount point.
 
+config TINIT_MQLOG_GROUP
+	string "Message queue log FS group"
+	default "elogd"
+	help
+	  Group name of message queue log filesystem.
+
 config TINIT_GID
 	int "Group ID"
 	default 0

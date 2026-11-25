@@ -11,7 +11,6 @@
 #define CONFIG_TINIT_MQLOG_NAME      "/init"
 #define CONFIG_TINIT_MQLOG_MODE      (S_IWUSR | S_IRGRP)
 #define CONFIG_TINIT_MQLOG_DEPTH     (64U)
-#define CONFIG_TINIT_MQLOG_GROUP     "elogd"
 
 static struct elog_multi tinit_toplog;
 static struct elog_stdio tinit_stdlog;
